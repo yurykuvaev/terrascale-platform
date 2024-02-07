@@ -1,0 +1,50 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl.bak
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+*.tfplan
+*.tfplan.binary
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terragrunt
+.terragrunt-cache/
+terragrunt-debug.tfvars.json
+
+# Local-only tfvars (commit *.tfvars.example instead)
+*.auto.tfvars
+*.auto.tfvars.json
+*.local.tfvars
+
+# Sensitive
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+bin/
+dist/
+coverage.out
+*.test
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Python (scripts/)
+__pycache__/
+*.pyc
+.venv/
+venv/
