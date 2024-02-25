@@ -46,6 +46,12 @@ variable "cluster_name" {
   default     = null
 }
 
+variable "enable_vpc_endpoints" {
+  description = "Provision interface and gateway VPC endpoints for common AWS services. Disable in dev to save cost."
+  type        = bool
+  default     = true
+}
+
 variable "tags" {
   description = "Additional tags applied to all resources."
   type        = map(string)
