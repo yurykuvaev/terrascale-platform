@@ -52,6 +52,41 @@ variable "enable_vpc_endpoints" {
   default     = true
 }
 
+variable "enable_flow_logs" {
+  description = "Capture VPC flow logs."
+  type        = bool
+  default     = true
+}
+
+variable "flow_logs_destination_type" {
+  description = "Where to ship flow logs. Either 'cloud-watch-logs' or 's3'."
+  type        = string
+  default     = "cloud-watch-logs"
+
+  validation {
+    condition     = contains(["cloud-watch-logs", "s3"], var.flow_logs_destination_type)
+    error_message = "flow_logs_destination_type must be 'cloud-watch-logs' or 's3'."
+  }
+}
+
+variable "flow_logs_retention_days" {
+  description = "CloudWatch retention for flow logs. Ignored when destination is S3."
+  type        = number
+  default     = 30
+}
+
+variable "flow_logs_kms_key_arn" {
+  description = "KMS key to encrypt flow log group. Ignored when destination is S3."
+  type        = string
+  default     = null
+}
+
+variable "flow_logs_s3_arn" {
+  description = "S3 bucket ARN that flow logs are delivered to. Required when destination is S3."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "Additional tags applied to all resources."
   type        = map(string)
