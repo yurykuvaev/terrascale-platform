@@ -18,5 +18,8 @@ module "eks" {
 
   enable_cluster_creator_admin_permissions = true
 
+  eks_managed_node_group_defaults = local.default_node_group_defaults
+  eks_managed_node_groups         = var.managed_node_groups
+
   tags = var.tags
 }

@@ -36,6 +36,16 @@ variable "endpoint_public_access_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "managed_node_groups" {
+  description = <<-EOT
+    Map of managed node group definitions. Keys are group names; values are
+    objects with at least min_size, max_size, desired_size, instance_types.
+    Additional fields (labels, taints, capacity_type) are forwarded as-is.
+  EOT
+  type        = any
+  default     = {}
+}
+
 variable "tags" {
   description = "Additional tags applied to all resources."
   type        = map(string)
