@@ -21,5 +21,7 @@ module "eks" {
   eks_managed_node_group_defaults = local.default_node_group_defaults
   eks_managed_node_groups         = var.managed_node_groups
 
+  access_entries = var.access_entries
+
   tags = var.tags
 }

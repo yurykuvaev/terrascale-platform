@@ -36,6 +36,17 @@ variable "endpoint_public_access_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "access_entries" {
+  description = <<-EOT
+    Map of access entries to grant Kubernetes API access to IAM principals.
+    Each entry's key is a stable identifier; the value contains principal_arn,
+    type ("STANDARD" or "EC2_LINUX"/"FARGATE_LINUX"/"EC2_WINDOWS"), kubernetes_groups,
+    and an optional policy_associations list.
+  EOT
+  type        = any
+  default     = {}
+}
+
 variable "managed_node_groups" {
   description = <<-EOT
     Map of managed node group definitions. Keys are group names; values are
