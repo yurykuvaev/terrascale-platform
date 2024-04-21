@@ -36,6 +36,12 @@ variable "endpoint_public_access_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "encrypt_secrets" {
+  description = "Enable envelope encryption of Kubernetes secrets with a customer-managed KMS key."
+  type        = bool
+  default     = true
+}
+
 variable "access_entries" {
   description = <<-EOT
     Map of access entries to grant Kubernetes API access to IAM principals.

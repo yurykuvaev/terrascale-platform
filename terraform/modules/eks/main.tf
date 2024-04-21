@@ -18,6 +18,16 @@ module "eks" {
 
   enable_cluster_creator_admin_permissions = true
 
+  cluster_encryption_config = var.encrypt_secrets ? {
+    resources        = ["secrets"]
+    provider_key_arn = aws_kms_key.secrets[0].arn
+  } : {}
+
+  # The upstream module also creates a KMS key when one isn't provided. Disable
+  # that path because we manage the key explicitly (so rotation and alias are
+  # under our control).
+  create_kms_key = false
+
   eks_managed_node_group_defaults = local.default_node_group_defaults
   eks_managed_node_groups         = var.managed_node_groups
 

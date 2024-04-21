@@ -28,3 +28,8 @@ output "oidc_provider_url" {
   description = "URL of the IAM OIDC provider for IRSA."
   value       = module.eks.oidc_provider
 }
+
+output "secrets_kms_key_arn" {
+  description = "ARN of the KMS key used for secrets encryption (null if disabled)."
+  value       = var.encrypt_secrets ? aws_kms_key.secrets[0].arn : null
+}
