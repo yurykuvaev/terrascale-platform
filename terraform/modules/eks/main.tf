@@ -18,6 +18,9 @@ module "eks" {
 
   enable_cluster_creator_admin_permissions = true
 
+  cluster_enabled_log_types              = var.control_plane_log_types
+  cloudwatch_log_group_retention_in_days = var.control_plane_log_retention_days
+
   cluster_encryption_config = var.encrypt_secrets ? {
     resources        = ["secrets"]
     provider_key_arn = aws_kms_key.secrets[0].arn

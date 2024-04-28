@@ -42,6 +42,18 @@ variable "encrypt_secrets" {
   default     = true
 }
 
+variable "control_plane_log_types" {
+  description = "EKS control plane logs to send to CloudWatch."
+  type        = list(string)
+  default     = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+}
+
+variable "control_plane_log_retention_days" {
+  description = "Retention for EKS control plane logs in CloudWatch."
+  type        = number
+  default     = 30
+}
+
 variable "access_entries" {
   description = <<-EOT
     Map of access entries to grant Kubernetes API access to IAM principals.
