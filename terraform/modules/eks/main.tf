@@ -31,6 +31,36 @@ module "eks" {
   # under our control).
   create_kms_key = false
 
+  # Tighter node-to-node rules. The module's defaults are pretty permissive;
+  # we narrow ingress to only what kubelet, CoreDNS, and the AWS LB Controller
+  # need. NodePort ranges stay open inside the SG itself.
+  node_security_group_additional_rules = {
+    ingress_self_all = {
+      description = "Node to node all"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "ingress"
+      self        = true
+    }
+    ingress_cluster_kubelet = {
+      description                   = "Cluster API to node kubelets"
+      protocol                      = "tcp"
+      from_port                     = 10250
+      to_port                       = 10250
+      type                          = "ingress"
+      source_cluster_security_group = true
+    }
+    ingress_alb_webhooks = {
+      description                   = "Cluster API to AWS LB Controller webhook"
+      protocol                      = "tcp"
+      from_port                     = 9443
+      to_port                       = 9443
+      type                          = "ingress"
+      source_cluster_security_group = true
+    }
+  }
+
   eks_managed_node_group_defaults = local.default_node_group_defaults
   eks_managed_node_groups         = var.managed_node_groups
 
