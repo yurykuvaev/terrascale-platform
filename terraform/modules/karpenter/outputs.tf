@@ -17,3 +17,13 @@ output "namespace" {
   description = "Namespace Karpenter runs in."
   value       = kubernetes_namespace_v1.karpenter.metadata[0].name
 }
+
+output "node_role_arn" {
+  description = "ARN of the IAM role assumed by Karpenter-provisioned nodes."
+  value       = aws_iam_role.node.arn
+}
+
+output "node_role_name" {
+  description = "Name of the IAM role assumed by Karpenter-provisioned nodes."
+  value       = aws_iam_role.node.name
+}

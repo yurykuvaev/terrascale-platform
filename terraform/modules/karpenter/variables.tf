@@ -20,9 +20,8 @@ variable "oidc_provider_url" {
 
 variable "node_iam_role_name" {
   description = <<-EOT
-    Name of the IAM role Karpenter-provisioned nodes assume. The role must be
-    listed in the cluster's access entries with the AmazonEKSAutoNodePolicy
-    or equivalent.
+    Name of the IAM role Karpenter-provisioned nodes assume. The role is
+    created by this module; this variable just controls its name.
   EOT
   type        = string
 }
