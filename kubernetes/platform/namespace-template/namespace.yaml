@@ -1,0 +1,68 @@
+# Template namespace illustrating the platform's defaults. New tenant
+# namespaces should match the labels and the default-deny NetworkPolicy.
+#
+# Apply via ArgoCD per environment, or stamp out with Helm in charts/tenant.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: example-tenant
+  labels:
+    # Pod Security Standards: enforce the restricted profile, audit the same.
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+
+    # Tenant tags consumed by Grafana dashboards and AlertManager routes.
+    platform.terrascale.io/tenant: example
+    platform.terrascale.io/tier: standard
+---
+# Default-deny ingress + egress. Tenants opt back in by creating their own
+# NetworkPolicy that allows the specific traffic they need.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: example-tenant
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Allow DNS egress to kube-system. Without this every workload breaks DNS.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: example-tenant
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# Default LimitRange so missing requests/limits don't crash the platform.
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+  namespace: example-tenant
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: 500m
+        memory: 512Mi
+      defaultRequest:
+        cpu: 50m
+        memory: 64Mi
