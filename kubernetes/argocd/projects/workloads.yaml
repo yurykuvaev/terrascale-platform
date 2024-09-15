@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: workloads
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: |
+    Tenant workloads. Sources are limited to the platform's own repo and
+    tenant repos under github.com/yurykuvaev/. Cluster-scoped resources are
+    blocked — tenants cannot create CRDs or ClusterRoles.
+
+  sourceRepos:
+    - https://github.com/yurykuvaev/terrascale-platform.git
+    - https://github.com/yurykuvaev/*
+
+  # Wildcard namespaces, but not argocd or any of the platform namespaces.
+  destinations:
+    - namespace: "*"
+      server: https://kubernetes.default.svc
+
+  clusterResourceBlacklist:
+    - group: "*"
+      kind: "*"
+
+  namespaceResourceBlacklist:
+    - group: ""
+      kind: ResourceQuota
+    - group: ""
+      kind: LimitRange
+    - group: networking.k8s.io
+      kind: NetworkPolicy
+
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  orphanedResources:
+    warn: true
