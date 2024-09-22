@@ -1,0 +1,60 @@
+# ApplicationSet that drives every platform component. The git generator
+# walks kubernetes/platform/<env>/ and creates one Application per directory
+# discovered. The directory layout is the source of truth — adding a new
+# platform service means adding a directory and committing.
+#
+# This is intentionally minimal: each leaf has its own values file referencing
+# the upstream Helm chart it wraps.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - env: dev
+                - env: staging
+                - env: prod
+          - git:
+              repoURL: https://github.com/yurykuvaev/terrascale-platform.git
+              revision: main
+              directories:
+                - path: "kubernetes/platform/{{.env}}/*"
+
+  template:
+    metadata:
+      name: "{{.path.basename}}-{{.env}}"
+      labels:
+        platform.terrascale.io/component: "{{.path.basename}}"
+        platform.terrascale.io/env: "{{.env}}"
+    spec:
+      project: platform
+
+      source:
+        repoURL: https://github.com/yurykuvaev/terrascale-platform.git
+        targetRevision: main
+        path: "{{.path.path}}"
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{.path.basename}}"
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
+          - ServerSideApply=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
