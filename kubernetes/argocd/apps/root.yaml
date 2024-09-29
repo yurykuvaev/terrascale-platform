@@ -1,0 +1,33 @@
+# Root "app-of-apps". Bootstraps everything under kubernetes/argocd/ — the
+# AppProjects, the ApplicationSets, and any one-off platform Applications.
+# After bootstrap, ArgoCD self-manages: changes to this file (and anything it
+# references) flow through git just like everything else.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/yurykuvaev/terrascale-platform.git
+    targetRevision: main
+    path: kubernetes/argocd
+    directory:
+      recurse: true
+      include: "{projects/*.yaml,apps/*.yaml}"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
