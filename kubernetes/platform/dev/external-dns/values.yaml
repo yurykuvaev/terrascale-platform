@@ -1,0 +1,39 @@
+external-dns:
+  provider:
+    name: aws
+
+  txtOwnerId: terrascale-dev
+  txtPrefix: "_external-dns."
+
+  policy: sync
+
+  domainFilters:
+    - dev.example.com
+  zoneIdFilters:
+    - "Z0123456789DEVPLACEHOLDER"
+
+  sources:
+    - service
+    - ingress
+
+  serviceAccount:
+    create: true
+    name: external-dns
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/terrascale-dev-external-dns"
+
+  nodeSelector:
+    workload-class: system
+
+  tolerations:
+    - key: platform.terrascale.io/system
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 128Mi

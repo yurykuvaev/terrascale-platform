@@ -1,0 +1,37 @@
+aws-load-balancer-controller:
+  clusterName: terrascale-dev
+  region: us-east-1
+
+  serviceAccount:
+    create: true
+    name: aws-load-balancer-controller
+    # Set by Terraform output; ApplicationSet pulls this from a SecretRef
+    # once the secrets module is wired (Phase 7).
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/terrascale-dev-alb-controller"
+
+  nodeSelector:
+    workload-class: system
+
+  tolerations:
+    - key: platform.terrascale.io/system
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+
+  podDisruptionBudget:
+    maxUnavailable: 1
+
+  enableServiceMutatorWebhook: false
+
+  defaultTags:
+    Environment: dev
+    Project: terrascale-platform
+    ManagedBy: argocd
