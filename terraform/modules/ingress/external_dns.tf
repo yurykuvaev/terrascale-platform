@@ -58,45 +58,5 @@ module "external_dns_irsa" {
   tags              = var.tags
 }
 
-resource "helm_release" "external_dns" {
-  count = length(var.external_dns_zone_id_filters) > 0 ? 1 : 0
-
-  name       = "external-dns"
-  repository = "https://kubernetes-sigs.github.io/external-dns"
-  chart      = "external-dns"
-  version    = var.external_dns_chart_version
-  namespace  = kubernetes_namespace_v1.ingress.metadata[0].name
-
-  values = [yamlencode({
-    provider = "aws"
-    aws = {
-      region = var.region
-      zoneType = "public"
-    }
-    txtOwnerId    = var.cluster_name
-    domainFilters = var.external_dns_domain_filters
-    zoneIdFilters = var.external_dns_zone_id_filters
-
-    sources = ["service", "ingress"]
-    policy  = "sync"
-
-    serviceAccount = {
-      create = true
-      name   = "external-dns"
-      annotations = module.external_dns_irsa[0].service_account_annotation
-    }
-
-    nodeSelector = { "workload-class" = "system" }
-    tolerations = [{
-      key      = "platform.terrascale.io/system"
-      operator = "Equal"
-      value    = "true"
-      effect   = "NoSchedule"
-    }]
-
-    resources = {
-      requests = { cpu = "50m", memory = "64Mi" }
-      limits   = { memory = "128Mi" }
-    }
-  })]
-}
+# Helm release for ExternalDNS has moved to ArgoCD; see
+# kubernetes/platform/<env>/external-dns.

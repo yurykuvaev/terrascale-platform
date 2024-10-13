@@ -1,7 +1,9 @@
-# AWS Load Balancer Controller — provisions ALBs and NLBs from Ingress and
-# Service objects. The IAM permission set below is taken from the upstream
-# install guide; we keep it here rather than using a managed policy because
-# the upstream policy is published as JSON, not as an AWS-managed policy ARN.
+# AWS Load Balancer Controller IAM only.
+#
+# As of 2024-10 the chart itself is installed by ArgoCD from
+# kubernetes/platform/<env>/aws-load-balancer-controller. This module owns
+# only the AWS-side surface (IAM policy + IRSA role); the Helm release moved
+# to GitOps so chart changes ride the normal review path.
 
 resource "kubernetes_namespace_v1" "ingress" {
   metadata {
@@ -39,35 +41,5 @@ module "alb_controller_irsa" {
   tags               = var.tags
 }
 
-resource "helm_release" "alb_controller" {
-  name       = "aws-load-balancer-controller"
-  repository = "https://aws.github.io/eks-charts"
-  chart      = "aws-load-balancer-controller"
-  version    = var.alb_chart_version
-  namespace  = kubernetes_namespace_v1.ingress.metadata[0].name
-
-  values = [yamlencode({
-    clusterName = var.cluster_name
-    region      = var.region
-    vpcId       = var.vpc_id
-
-    serviceAccount = {
-      create = true
-      name   = "aws-load-balancer-controller"
-      annotations = module.alb_controller_irsa.service_account_annotation
-    }
-
-    nodeSelector = { "workload-class" = "system" }
-    tolerations = [{
-      key      = "platform.terrascale.io/system"
-      operator = "Equal"
-      value    = "true"
-      effect   = "NoSchedule"
-    }]
-
-    resources = {
-      requests = { cpu = "100m", memory = "128Mi" }
-      limits   = { memory = "256Mi" }
-    }
-  })]
-}
+# Helm release for the ALB controller has moved to ArgoCD; see
+# kubernetes/platform/<env>/aws-load-balancer-controller.

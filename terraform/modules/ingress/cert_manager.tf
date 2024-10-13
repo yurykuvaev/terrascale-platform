@@ -68,36 +68,5 @@ resource "kubernetes_namespace_v1" "cert_manager" {
   }
 }
 
-resource "helm_release" "cert_manager" {
-  name       = "cert-manager"
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-  version    = var.cert_manager_chart_version
-  namespace  = kubernetes_namespace_v1.cert_manager.metadata[0].name
-
-  values = [yamlencode({
-    crds = { enabled = true }
-
-    serviceAccount = length(var.external_dns_zone_id_filters) > 0 ? {
-      create = true
-      name   = "cert-manager"
-      annotations = module.cert_manager_irsa[0].service_account_annotation
-    } : { create = true }
-
-    securityContext = {
-      runAsNonRoot = true
-      seccompProfile = { type = "RuntimeDefault" }
-    }
-
-    nodeSelector = { "workload-class" = "system" }
-    tolerations = [{
-      key      = "platform.terrascale.io/system"
-      operator = "Equal"
-      value    = "true"
-      effect   = "NoSchedule"
-    }]
-
-    webhook  = { nodeSelector = { "workload-class" = "system" } }
-    cainjector = { nodeSelector = { "workload-class" = "system" } }
-  })]
-}
+# Helm release for cert-manager has moved to ArgoCD; see
+# kubernetes/platform/<env>/cert-manager.

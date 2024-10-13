@@ -12,35 +12,5 @@ locals {
   cluster_issuers_enabled = var.letsencrypt_email != null && length(var.external_dns_zone_id_filters) > 0
 }
 
-resource "kubernetes_manifest" "cluster_issuer" {
-  for_each = local.cluster_issuers_enabled ? local.letsencrypt_endpoints : {}
-
-  manifest = {
-    apiVersion = "cert-manager.io/v1"
-    kind       = "ClusterIssuer"
-    metadata = {
-      name = "letsencrypt-${each.key}"
-    }
-    spec = {
-      acme = {
-        email  = var.letsencrypt_email
-        server = each.value
-        privateKeySecretRef = {
-          name = "letsencrypt-${each.key}-account"
-        }
-        solvers = [{
-          dns01 = {
-            route53 = {
-              region = var.region
-            }
-          }
-          selector = {
-            dnsZones = var.external_dns_domain_filters
-          }
-        }]
-      }
-    }
-  }
-
-  depends_on = [helm_release.cert_manager]
-}
+# ClusterIssuers moved to ArgoCD-managed manifests; see
+# kubernetes/platform/<env>/cert-manager-issuers/.
