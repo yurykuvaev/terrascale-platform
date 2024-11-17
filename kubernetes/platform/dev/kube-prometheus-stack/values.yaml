@@ -1,0 +1,116 @@
+kube-prometheus-stack:
+  fullnameOverride: kps
+
+  defaultRules:
+    create: true
+    rules:
+      etcd: false        # AWS manages etcd; alerts here always fire false-positive.
+      kubeProxy: false   # We use VPC CNI, kube-proxy alerts are noisy on EKS.
+
+  alertmanager:
+    alertmanagerSpec:
+      replicas: 1
+
+      nodeSelector:
+        workload-class: system
+      tolerations:
+        - key: platform.terrascale.io/system
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
+
+      storage:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: gp3
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+
+  prometheus:
+    prometheusSpec:
+      replicas: 1
+      retention: 15d
+      retentionSize: 45GB
+
+      nodeSelector:
+        workload-class: system
+      tolerations:
+        - key: platform.terrascale.io/system
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
+
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      ruleSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: gp3
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 50Gi
+
+      resources:
+        requests:
+          cpu: 500m
+          memory: 2Gi
+        limits:
+          memory: 4Gi
+
+  grafana:
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+
+    persistence:
+      enabled: true
+      storageClassName: gp3
+      size: 10Gi
+
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+        label: grafana_dashboard
+        labelValue: "1"
+      datasources:
+        enabled: true
+        searchNamespace: ALL
+        label: grafana_datasource
+        labelValue: "1"
+
+    additionalDataSources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki-gateway.observability.svc:80
+        jsonData:
+          maxLines: 1000
+
+  prometheusOperator:
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+
+  kube-state-metrics:
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
