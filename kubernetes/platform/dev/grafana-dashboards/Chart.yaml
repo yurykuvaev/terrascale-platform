@@ -1,0 +1,7 @@
+apiVersion: v2
+name: grafana-dashboards
+description: |
+  Platform Grafana dashboards. Each ConfigMap is labelled grafana_dashboard=1
+  so the kube-prometheus-stack Grafana sidecar picks it up automatically.
+type: application
+version: 0.1.0

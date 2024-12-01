@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: karpenter-overview
+  namespace: observability
+  labels:
+    grafana_dashboard: "1"
+    platform.terrascale.io/dashboard: karpenter
+data:
+  karpenter.json: |-
+    {
+      "title": "Karpenter Overview",
+      "uid": "karpenter-overview",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "30s",
+      "tags": ["karpenter", "platform"],
+      "panels": [
+        {
+          "id": 1,
+          "type": "stat",
+          "title": "Pending pods",
+          "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+          "targets": [{
+            "expr": "sum(karpenter_pods_state{phase=\"pending\"})"
+          }]
+        },
+        {
+          "id": 2,
+          "type": "timeseries",
+          "title": "Nodes by capacity type",
+          "gridPos": {"x": 6, "y": 0, "w": 18, "h": 8},
+          "targets": [{
+            "expr": "count by (capacity_type) (karpenter_nodes_total_count)",
+            "legendFormat": "{{capacity_type}}"
+          }]
+        },
+        {
+          "id": 3,
+          "type": "timeseries",
+          "title": "Hourly cost (USD)",
+          "gridPos": {"x": 0, "y": 4, "w": 6, "h": 4},
+          "targets": [{
+            "expr": "sum(karpenter_nodes_total_cost)"
+          }]
+        }
+      ]
+    }

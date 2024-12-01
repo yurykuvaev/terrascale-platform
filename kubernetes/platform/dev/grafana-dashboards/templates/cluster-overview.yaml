@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-overview
+  namespace: observability
+  labels:
+    grafana_dashboard: "1"
+    platform.terrascale.io/dashboard: cluster
+data:
+  cluster.json: |-
+    {
+      "title": "Cluster Overview",
+      "uid": "cluster-overview",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "30s",
+      "tags": ["cluster", "platform"],
+      "panels": [
+        {
+          "id": 1,
+          "type": "stat",
+          "title": "Nodes",
+          "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+          "targets": [{"expr": "count(kube_node_info)"}]
+        },
+        {
+          "id": 2,
+          "type": "stat",
+          "title": "Running pods",
+          "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+          "targets": [{"expr": "sum(kube_pod_status_phase{phase=\"Running\"})"}]
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "CPU requested",
+          "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+          "targets": [{"expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\"})"}]
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Memory requested",
+          "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+          "targets": [{"expr": "sum(kube_pod_container_resource_requests{resource=\"memory\"})"}]
+        },
+        {
+          "id": 5,
+          "type": "timeseries",
+          "title": "Pods by namespace",
+          "gridPos": {"x": 0, "y": 4, "w": 24, "h": 10},
+          "targets": [{
+            "expr": "sum by (namespace) (kube_pod_info)",
+            "legendFormat": "{{namespace}}"
+          }]
+        }
+      ]
+    }
