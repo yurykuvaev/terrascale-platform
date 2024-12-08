@@ -1,0 +1,77 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: platform-baseline
+  namespace: observability
+spec:
+  groups:
+    - name: platform.cluster
+      interval: 1m
+      rules:
+        - alert: NodeReadyFlapping
+          expr: |
+            changes(kube_node_status_condition{condition="Ready",status="true"}[15m]) > 4
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Node {{ $labels.node }} is flapping Ready"
+            description: |
+              Node {{ $labels.node }} has changed Ready status more than 4 times
+              in the last 15 minutes.
+
+        - alert: PersistentVolumeFillingUp
+          expr: |
+            (
+              kubelet_volume_stats_used_bytes
+              / kubelet_volume_stats_capacity_bytes
+            ) > 0.85
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "PV {{ $labels.persistentvolumeclaim }} > 85% full"
+
+    - name: platform.argocd
+      interval: 1m
+      rules:
+        - alert: ArgoCDAppOutOfSync
+          expr: |
+            argocd_app_info{sync_status!="Synced"} == 1
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "ArgoCD application {{ $labels.name }} out of sync"
+
+        - alert: ArgoCDAppUnhealthy
+          expr: |
+            argocd_app_info{health_status!="Healthy"} == 1
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "ArgoCD application {{ $labels.name }} unhealthy"
+
+    - name: platform.karpenter
+      interval: 1m
+      rules:
+        - alert: KarpenterPendingPodsHigh
+          expr: |
+            sum(karpenter_pods_state{phase="pending"}) > 20
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Karpenter has > 20 pending pods for 10m"
+
+        - alert: KarpenterNodeProvisioningFailed
+          expr: |
+            increase(karpenter_nodeclaims_disrupted_total[10m]) > 0
+            and on()
+            increase(karpenter_nodeclaims_launched_total[10m]) == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Karpenter is disrupting nodes but not launching new ones"

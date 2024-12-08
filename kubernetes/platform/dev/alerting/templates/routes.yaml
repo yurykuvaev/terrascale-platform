@@ -1,0 +1,73 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: platform-routes
+  namespace: observability
+  labels:
+    alertmanagerConfig: platform
+spec:
+  route:
+    receiver: slack-platform
+    groupBy: [alertname, namespace, severity]
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 4h
+
+    routes:
+      # Severity-based routing — critical to PagerDuty, the rest to Slack.
+      - matchers:
+          - name: severity
+            value: critical
+        receiver: pagerduty-platform
+        continue: true
+
+      # Tenant-specific channels.
+      - matchers:
+          - name: "platform.terrascale.io/tenant"
+            matchType: "="
+        receiver: slack-tenant
+
+      # Karpenter alerts get their own room so capacity churn doesn't drown
+      # everything else.
+      - matchers:
+          - name: namespace
+            value: karpenter
+        receiver: slack-karpenter
+
+  receivers:
+    - name: slack-platform
+      slackConfigs:
+        - apiURL:
+            name: alertmanager-slack
+            key: webhook-platform
+          channel: "#platform-alerts"
+          sendResolved: true
+          title: "{{ .CommonLabels.alertname }}"
+          text: |
+            *Severity:* {{ .CommonLabels.severity }}
+            *Namespace:* {{ .CommonLabels.namespace }}
+            {{ range .Alerts }}{{ .Annotations.description }}{{ end }}
+
+    - name: slack-tenant
+      slackConfigs:
+        - apiURL:
+            name: alertmanager-slack
+            key: webhook-tenant
+          channel: "#alerts-{{ .CommonLabels.tenant }}"
+          sendResolved: true
+
+    - name: slack-karpenter
+      slackConfigs:
+        - apiURL:
+            name: alertmanager-slack
+            key: webhook-platform
+          channel: "#karpenter"
+          sendResolved: true
+
+    - name: pagerduty-platform
+      pagerdutyConfigs:
+        - routingKey:
+            name: alertmanager-pagerduty
+            key: routing-key
+          description: "{{ .CommonLabels.alertname }} ({{ .CommonLabels.namespace }})"
+          severity: "{{ .CommonLabels.severity }}"

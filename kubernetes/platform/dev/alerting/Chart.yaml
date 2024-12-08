@@ -1,0 +1,5 @@
+apiVersion: v2
+name: alerting
+description: Platform AlertManager routes and shared PrometheusRule groups.
+type: application
+version: 0.1.0
