@@ -1,0 +1,10 @@
+apiVersion: v2
+name: external-secrets
+description: Umbrella chart pinning the External Secrets Operator for dev.
+type: application
+version: 0.1.0
+appVersion: "0.10.0"
+dependencies:
+  - name: external-secrets
+    version: "0.10.0"
+    repository: "https://charts.external-secrets.io"

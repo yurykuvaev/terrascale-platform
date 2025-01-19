@@ -1,0 +1,41 @@
+external-secrets:
+  installCRDs: true
+
+  serviceAccount:
+    create: true
+    name: external-secrets
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/terrascale-dev-external-secrets"
+
+  nodeSelector:
+    workload-class: system
+  tolerations:
+    - key: platform.terrascale.io/system
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+
+  webhook:
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+
+  certController:
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
