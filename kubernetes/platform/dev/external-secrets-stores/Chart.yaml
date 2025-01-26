@@ -1,0 +1,8 @@
+apiVersion: v2
+name: external-secrets-stores
+description: |
+  ClusterSecretStores for the External Secrets Operator. One per backend
+  (AWS Secrets Manager, AWS SSM Parameter Store). Tenants reference these
+  by name from their ExternalSecret resources.
+type: application
+version: 0.1.0
