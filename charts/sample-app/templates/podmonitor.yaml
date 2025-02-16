@@ -1,0 +1,15 @@
+{{- if .Values.podMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ include "sample-app.fullname" . }}
+  labels: {{- include "sample-app.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{- include "sample-app.selectorLabels" . | nindent 6 }}
+  podMetricsEndpoints:
+    - port: http
+      path: /metrics
+      interval: {{ .Values.podMonitor.interval }}
+      scrapeTimeout: {{ .Values.podMonitor.scrapeTimeout }}
+{{- end }}

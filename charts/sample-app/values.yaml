@@ -1,0 +1,62 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/yurykuvaev/terrascale-platform/sample-service
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+env:
+  ADDR: ":8080"
+  ENVIRONMENT: dev
+
+# Read GREETING from a secret materialised by ESO. The ExternalSecret lives
+# alongside the chart (templates/external-secret.yaml).
+externalSecret:
+  enabled: true
+  refreshInterval: 1h
+  secretStoreRef:
+    name: aws-secretsmanager
+    kind: ClusterSecretStore
+  remoteRef:
+    secretKey: GREETING
+    secretName: terrascale-dev/sample-app/greeting
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: alb
+  host: sample.dev.example.com
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: sample.dev.example.com
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+# Sample-service is an application workload — runs on Karpenter nodes, no
+# system tolerations.
+podDisruptionBudget:
+  minAvailable: 1
+
+podMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s

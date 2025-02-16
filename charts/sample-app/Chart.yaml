@@ -1,0 +1,12 @@
+apiVersion: v2
+name: sample-app
+description: Helm chart for the canary sample-service workload.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - terrascale
+  - canary
+maintainers:
+  - name: Yury Kuvaev
+    email: kuvaevusa@gmail.com
