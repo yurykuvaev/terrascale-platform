@@ -1,0 +1,62 @@
+# Workload ApplicationSet. Each leaf under kubernetes/workloads/<env>/ is a
+# discrete tenant Application. Tenants own a directory each; the platform
+# team owns this generator.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: workloads
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - env: dev
+                - env: staging
+                - env: prod
+          - git:
+              repoURL: https://github.com/yurykuvaev/terrascale-platform.git
+              revision: main
+              directories:
+                - path: "kubernetes/workloads/{{.env}}/*"
+
+  template:
+    metadata:
+      name: "wl-{{.path.basename}}-{{.env}}"
+      labels:
+        platform.terrascale.io/tenant: "{{.path.basename}}"
+        platform.terrascale.io/env: "{{.env}}"
+    spec:
+      project: workloads
+
+      sources:
+        - repoURL: https://github.com/yurykuvaev/terrascale-platform.git
+          targetRevision: main
+          ref: values
+
+        - repoURL: https://github.com/yurykuvaev/terrascale-platform.git
+          targetRevision: main
+          path: charts/sample-app
+          helm:
+            valueFiles:
+              - "$values/{{.path.path}}/values.yaml"
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{.path.basename}}"
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
+          - ServerSideApply=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m

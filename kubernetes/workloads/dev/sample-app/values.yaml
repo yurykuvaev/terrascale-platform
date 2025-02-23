@@ -1,0 +1,25 @@
+replicaCount: 2
+
+image:
+  tag: "0.1.0"
+
+env:
+  ENVIRONMENT: dev
+
+ingress:
+  enabled: true
+  host: sample.dev.example.com
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging   # use staging in dev
+    external-dns.alpha.kubernetes.io/hostname: sample.dev.example.com
+
+externalSecret:
+  enabled: true
+  refreshInterval: 1h
+  remoteRef:
+    secretName: terrascale-dev/sample-app/greeting
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
