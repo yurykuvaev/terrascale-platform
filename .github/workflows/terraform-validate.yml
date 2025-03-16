@@ -1,0 +1,64 @@
+name: terraform-validate
+
+on:
+  pull_request:
+    paths:
+      - "terraform/**"
+      - ".github/workflows/terraform-validate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "terraform/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+          terraform_wrapper: false
+
+      - name: terraform fmt
+        run: terraform fmt -check -recursive terraform/
+
+  validate:
+    runs-on: ubuntu-latest
+    needs: fmt
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - terraform/modules/network
+          - terraform/modules/eks
+          - terraform/modules/karpenter
+          - terraform/modules/ingress
+          - terraform/modules/argocd
+          - terraform/modules/observability
+          - terraform/modules/secrets
+          - terraform/modules/irsa
+          - terraform/modules/github-oidc
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+          terraform_wrapper: false
+
+      - name: terraform init -backend=false
+        working-directory: ${{ matrix.module }}
+        run: terraform init -backend=false -input=false -no-color
+
+      - name: terraform validate
+        working-directory: ${{ matrix.module }}
+        run: terraform validate -no-color
