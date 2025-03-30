@@ -1,0 +1,66 @@
+name: terraform-apply
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "terraform/**"
+  workflow_dispatch:
+    inputs:
+      env:
+        description: "Environment to apply"
+        required: true
+        type: choice
+        options: [dev, staging, prod]
+        default: dev
+
+permissions:
+  id-token: write
+  contents: read
+
+# Serialise applies — never two terragrunt apply runs into the same env.
+concurrency:
+  group: terraform-apply-${{ github.event.inputs.env || 'dev' }}
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.env || 'dev' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+          terraform_wrapper: false
+
+      - name: install terragrunt
+        run: |
+          curl -sLo /usr/local/bin/terragrunt \
+            https://github.com/gruntwork-io/terragrunt/releases/download/v0.66.9/terragrunt_linux_amd64
+          chmod +x /usr/local/bin/terragrunt
+
+      - name: resolve target env
+        id: target
+        run: |
+          ENV="${{ github.event.inputs.env || 'dev' }}"
+          echo "env=$ENV" >> "$GITHUB_OUTPUT"
+
+      - name: configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/terrascale-${{ steps.target.outputs.env }}-ci-apply
+          aws-region: us-east-1
+
+      - name: terragrunt run-all apply
+        working-directory: terraform/live/${{ steps.target.outputs.env }}
+        env:
+          TF_INPUT: "0"
+          TF_IN_AUTOMATION: "1"
+        run: |
+          terragrunt run-all apply \
+            --terragrunt-non-interactive \
+            --terragrunt-no-color \
+            -auto-approve
