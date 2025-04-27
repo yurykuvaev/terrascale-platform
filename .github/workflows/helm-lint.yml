@@ -1,0 +1,49 @@
+name: helm-lint
+
+on:
+  pull_request:
+    paths:
+      - "charts/**"
+      - "kubernetes/**"
+      - ".github/workflows/helm-lint.yml"
+  push:
+    branches: [main]
+    paths:
+      - "charts/**"
+      - "kubernetes/**"
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.15.4
+
+      - name: helm dependency build (umbrellas)
+        run: |
+          set -euo pipefail
+          for d in $(find kubernetes/platform charts -name Chart.yaml -printf '%h\n' | sort -u); do
+            if grep -q '^dependencies:' "$d/Chart.yaml"; then
+              echo "==> $d"
+              helm dependency build "$d"
+            fi
+          done
+
+      - name: helm lint
+        run: |
+          set -euo pipefail
+          rc=0
+          for d in $(find kubernetes/platform charts -name Chart.yaml -printf '%h\n' | sort -u); do
+            echo "==> $d"
+            helm lint "$d" --quiet || rc=1
+          done
+          exit "$rc"
+
+      - name: helm template (sample-app)
+        run: helm template terrascale-test charts/sample-app > /dev/null
