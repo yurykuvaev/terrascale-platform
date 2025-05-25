@@ -1,0 +1,37 @@
+external-secrets:
+  installCRDs: true
+
+  replicaCount: 2
+
+  serviceAccount:
+    create: true
+    name: external-secrets
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/terrascale-staging-external-secrets"
+
+  nodeSelector:
+    workload-class: system
+  tolerations:
+    - key: platform.terrascale.io/system
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+
+  webhook:
+    replicaCount: 2
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+
+  certController:
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule

@@ -1,0 +1,44 @@
+cert-manager:
+  crds:
+    enabled: true
+
+  serviceAccount:
+    create: true
+    name: cert-manager
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/terrascale-staging-cert-manager"
+
+  replicaCount: 2
+
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  nodeSelector:
+    workload-class: system
+
+  tolerations:
+    - key: platform.terrascale.io/system
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+
+  webhook:
+    replicaCount: 2
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+
+  cainjector:
+    replicaCount: 2
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule

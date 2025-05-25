@@ -1,0 +1,35 @@
+aws-load-balancer-controller:
+  clusterName: terrascale-staging
+  region: us-east-1
+
+  serviceAccount:
+    create: true
+    name: aws-load-balancer-controller
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/terrascale-staging-alb-controller"
+
+  replicaCount: 2
+
+  nodeSelector:
+    workload-class: system
+
+  tolerations:
+    - key: platform.terrascale.io/system
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+
+  podDisruptionBudget:
+    maxUnavailable: 1
+
+  defaultTags:
+    Environment: staging
+    Project: terrascale-platform
+    ManagedBy: argocd
