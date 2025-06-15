@@ -1,0 +1,43 @@
+aws-load-balancer-controller:
+  clusterName: terrascale-prod
+  region: us-east-1
+
+  serviceAccount:
+    create: true
+    name: aws-load-balancer-controller
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/terrascale-prod-alb-controller"
+
+  replicaCount: 3
+
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: aws-load-balancer-controller
+
+  nodeSelector:
+    workload-class: system
+
+  tolerations:
+    - key: platform.terrascale.io/system
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+
+  podDisruptionBudget:
+    minAvailable: 2
+
+  defaultTags:
+    Environment: prod
+    Project: terrascale-platform
+    ManagedBy: argocd

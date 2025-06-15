@@ -1,0 +1,10 @@
+apiVersion: v2
+name: aws-load-balancer-controller
+description: Umbrella chart for the AWS Load Balancer Controller, prod.
+type: application
+version: 0.1.0
+appVersion: "2.8.1"
+dependencies:
+  - name: aws-load-balancer-controller
+    version: "1.8.1"
+    repository: "https://aws.github.io/eks-charts"

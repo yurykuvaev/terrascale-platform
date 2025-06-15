@@ -1,0 +1,28 @@
+external-dns:
+  provider:
+    name: aws
+
+  txtOwnerId: terrascale-prod
+  txtPrefix: "_external-dns."
+
+  policy: sync
+
+  domainFilters:
+    - example.com
+  zoneIdFilters:
+    - "Z0123456789PRODUCTION"
+
+  serviceAccount:
+    create: true
+    name: external-dns
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/terrascale-prod-external-dns"
+
+  nodeSelector:
+    workload-class: system
+
+  tolerations:
+    - key: platform.terrascale.io/system
+      operator: Equal
+      value: "true"
+      effect: NoSchedule

@@ -1,0 +1,10 @@
+apiVersion: v2
+name: cert-manager
+description: Umbrella chart pinning cert-manager for prod.
+type: application
+version: 0.1.0
+appVersion: "v1.15.1"
+dependencies:
+  - name: cert-manager
+    version: "v1.15.1"
+    repository: "https://charts.jetstack.io"
