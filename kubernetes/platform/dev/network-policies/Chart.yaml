@@ -1,0 +1,7 @@
+apiVersion: v2
+name: network-policies
+description: |
+  Default-deny NetworkPolicies for the platform's own namespaces. Each
+  controller's traffic needs are allow-listed explicitly.
+type: application
+version: 0.1.0
