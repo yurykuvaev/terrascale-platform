@@ -36,14 +36,31 @@ resource "aws_iam_role" "controller" {
 # Trimmed-down Karpenter controller policy. Mirrors the upstream
 # CloudFormation template at karpenter.sh/v1.0/getting-started/.
 data "aws_iam_policy_document" "controller" {
+  # Launches are scoped by cluster tag — nothing without the discovery tag is
+  # in scope for this role to mutate, even though the resource ARN must be *.
   statement {
     sid = "AllowScopedEC2InstanceActions"
     actions = [
       "ec2:RunInstances",
       "ec2:CreateFleet",
-      "ec2:CreateLaunchTemplate",
     ]
     resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/karpenter.sh/cluster"
+      values   = [var.cluster_name]
+    }
+  }
+
+  statement {
+    sid       = "AllowLaunchTemplateCreate"
+    actions   = ["ec2:CreateLaunchTemplate"]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/karpenter.sh/cluster"
+      values   = [var.cluster_name]
+    }
   }
 
   statement {
@@ -56,8 +73,8 @@ data "aws_iam_policy_document" "controller" {
     resources = ["*"]
     condition {
       test     = "StringEquals"
-      variable = "ec2:ResourceTag/karpenter.sh/nodepool"
-      values   = ["*"]
+      variable = "ec2:ResourceTag/karpenter.sh/cluster"
+      values   = [var.cluster_name]
     }
   }
 
@@ -71,12 +88,35 @@ data "aws_iam_policy_document" "controller" {
     sid       = "AllowPassNodeRole"
     actions   = ["iam:PassRole"]
     resources = ["arn:aws:iam::*:role/${var.node_iam_role_name}"]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["ec2.amazonaws.com"]
+    }
+  }
+
+  # Instance profile management is per-cluster — Karpenter creates one
+  # profile per NodeClass and tags it with the cluster name.
+  statement {
+    sid     = "AllowScopedInstanceProfileCreate"
+    actions = ["iam:CreateInstanceProfile", "iam:TagInstanceProfile"]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/karpenter.sh/cluster"
+      values   = [var.cluster_name]
+    }
   }
 
   statement {
-    sid       = "AllowInstanceProfileManagement"
-    actions   = ["iam:AddRoleToInstanceProfile", "iam:CreateInstanceProfile", "iam:RemoveRoleFromInstanceProfile", "iam:DeleteInstanceProfile", "iam:GetInstanceProfile", "iam:TagInstanceProfile"]
+    sid     = "AllowScopedInstanceProfileMutation"
+    actions = ["iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile", "iam:DeleteInstanceProfile", "iam:GetInstanceProfile"]
     resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/karpenter.sh/cluster"
+      values   = [var.cluster_name]
+    }
   }
 
   statement {
