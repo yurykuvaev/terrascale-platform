@@ -1,0 +1,125 @@
+kube-prometheus-stack:
+  fullnameOverride: kps
+
+  defaultRules:
+    create: true
+    rules:
+      etcd: false
+      kubeProxy: false
+
+  alertmanager:
+    alertmanagerSpec:
+      replicas: 3
+      retention: 720h
+
+      nodeSelector:
+        workload-class: system
+      tolerations:
+        - key: platform.terrascale.io/system
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
+
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: alertmanager
+              topologyKey: topology.kubernetes.io/zone
+
+      storage:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: gp3
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 50Gi
+
+  prometheus:
+    prometheusSpec:
+      replicas: 2
+      retention: 30d
+      retentionSize: 180GB
+
+      nodeSelector:
+        workload-class: system
+      tolerations:
+        - key: platform.terrascale.io/system
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
+
+      podAntiAffinity: hard
+      podAntiAffinityTopologyKey: topology.kubernetes.io/zone
+
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      ruleSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: gp3
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 200Gi
+
+      resources:
+        requests:
+          cpu: 1000m
+          memory: 4Gi
+        limits:
+          memory: 8Gi
+
+  grafana:
+    replicas: 2
+
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+
+    persistence:
+      enabled: true
+      storageClassName: gp3
+      size: 20Gi
+
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+        label: grafana_dashboard
+        labelValue: "1"
+
+    additionalDataSources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki-gateway.observability.svc:80
+        jsonData:
+          maxLines: 1000
+
+  prometheusOperator:
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+
+  kube-state-metrics:
+    nodeSelector:
+      workload-class: system
+    tolerations:
+      - key: platform.terrascale.io/system
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
