@@ -1,0 +1,16 @@
+# Default
+*                              @yurykuvaev
+
+# Anything touching IAM, networking, or cluster security gets extra eyes.
+terraform/modules/eks/         @yurykuvaev
+terraform/modules/network/     @yurykuvaev
+terraform/modules/karpenter/   @yurykuvaev
+terraform/modules/github-oidc/ @yurykuvaev
+terraform/modules/secrets/     @yurykuvaev
+terraform/modules/waf/         @yurykuvaev
+
+# CI workflows
+.github/workflows/             @yurykuvaev
+
+# ADRs are immutable once accepted
+docs/adr/                      @yurykuvaev
