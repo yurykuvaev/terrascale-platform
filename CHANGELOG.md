@@ -6,6 +6,11 @@ numbers follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Bump EKS to 1.31 across all environments (dev rolled first, then staging,
+  then prod after a 2-week soak).
+
 ## [1.0.0] - 2025-11-23
 
 First tagged release. The platform is feature-complete for what was set
