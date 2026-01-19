@@ -14,7 +14,7 @@ locals {
 
 inputs = {
   cluster_name    = local.env.cluster_name
-  cluster_version = "1.30"
+  cluster_version = "1.31"
 
   # Private API only in prod. Reach via VPN, bastion, or AWS Client VPN.
   endpoint_public_access       = false

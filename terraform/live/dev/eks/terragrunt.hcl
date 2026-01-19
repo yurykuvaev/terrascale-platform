@@ -14,7 +14,7 @@ locals {
 
 inputs = {
   cluster_name    = local.env.cluster_name
-  cluster_version = "1.30"
+  cluster_version = "1.31"
 
   # Trust the role that Karpenter-provisioned nodes assume. The role itself is
   # created by the karpenter unit; we reference it by ARN so cluster apply

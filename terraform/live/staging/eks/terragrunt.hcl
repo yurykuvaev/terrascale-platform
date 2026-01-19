@@ -14,7 +14,7 @@ locals {
 
 inputs = {
   cluster_name    = local.env.cluster_name
-  cluster_version = "1.30"
+  cluster_version = "1.31"
 
   # Lock the public endpoint to a CI egress range; CI plans/applies via OIDC,
   # human access goes through VPN.
