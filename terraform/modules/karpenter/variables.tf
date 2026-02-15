@@ -35,7 +35,7 @@ variable "interruption_queue_message_retention_seconds" {
 variable "chart_version" {
   description = "Karpenter Helm chart version."
   type        = string
-  default     = "1.0.6"
+  default     = "1.0.8"
 }
 
 variable "namespace" {
