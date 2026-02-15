@@ -12,7 +12,7 @@ locals {
 
 inputs = {
   node_iam_role_name = "${local.env.cluster_name}-karpenter-node"
-  chart_version      = "1.0.6"
+  chart_version      = "1.0.8"
 
   # Longer interruption window in prod gives controllers more time to react.
   interruption_queue_message_retention_seconds = 600
