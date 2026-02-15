@@ -1,0 +1,41 @@
+name: Feature request
+description: Propose a change to the platform
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: |
+        What pain or capability gap is this addressing? Concrete
+        scenarios beat abstract descriptions.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: |
+        How would you implement it? If it's contentious, mention whether
+        you'd expect an ADR.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - New module
+        - Module change
+        - New tenant capability
+        - Operational tooling
+        - Documentation
+    validations:
+      required: true

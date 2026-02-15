@@ -1,0 +1,51 @@
+name: Bug report
+description: Something is broken on the platform
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: env
+    attributes:
+      label: Environment
+      options: [dev, staging, prod, local-kind]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Terraform module
+        - Terragrunt env wiring
+        - ArgoCD / GitOps
+        - Ingress (ALB / ExternalDNS / cert-manager)
+        - Observability (Prom / Loki / Grafana)
+        - Secrets (ESO / Secrets Manager)
+        - Karpenter
+        - CI/CD
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: |
+        What went wrong? Include `kubectl` / `terragrunt` output, ArgoCD
+        state, Grafana panels — whatever helps reproduce.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
