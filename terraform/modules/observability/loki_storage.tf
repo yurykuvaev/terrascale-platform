@@ -1,13 +1,7 @@
-# Loki backend: chunks live in S3, the schema index lives in TSDB on the
-# same bucket (boltdb-shipper deprecated). Bucket is encrypted and versioned;
-# expiry is driven by an S3 lifecycle rule rather than Loki's own retention,
-# because the bucket is the eventual source of truth.
+# Loki chunks + TSDB index. Retention via S3 lifecycle, not Loki config.
 
 resource "aws_s3_bucket" "loki" {
-  bucket = "${var.cluster_name}-loki"
-
-  # Loki re-creates objects readily; lose the bucket and we lose history.
-  # We don't force_destroy to avoid accidental wipes from `terraform destroy`.
+  bucket        = "${var.cluster_name}-loki"
   force_destroy = false
 
   tags = merge(var.tags, { Component = "loki" })

@@ -1,3 +1,8 @@
+{{/*
+  Each `{{ $labels.X }}` in the manifest below is a Prometheus template
+  expression, not a Helm one. We wrap them in `{{`...`}}` raw blocks so
+  Helm passes them through untouched.
+*/}}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -15,9 +20,9 @@ spec:
           labels:
             severity: warning
           annotations:
-            summary: "Node {{ $labels.node }} is flapping Ready"
+            summary: {{ printf "Node {{ $labels.node }} is flapping Ready" | quote }}
             description: |
-              Node {{ $labels.node }} has changed Ready status more than 4 times
+              Node {{`{{ $labels.node }}`}} has changed Ready status more than 4 times
               in the last 15 minutes.
 
         - alert: PersistentVolumeFillingUp
@@ -30,7 +35,7 @@ spec:
           labels:
             severity: warning
           annotations:
-            summary: "PV {{ $labels.persistentvolumeclaim }} > 85% full"
+            summary: {{ printf "PV {{ $labels.persistentvolumeclaim }} > 85%% full" | quote }}
 
     - name: platform.argocd
       interval: 1m
@@ -42,7 +47,7 @@ spec:
           labels:
             severity: warning
           annotations:
-            summary: "ArgoCD application {{ $labels.name }} out of sync"
+            summary: {{ printf "ArgoCD application {{ $labels.name }} out of sync" | quote }}
 
         - alert: ArgoCDAppUnhealthy
           expr: |
@@ -51,7 +56,7 @@ spec:
           labels:
             severity: warning
           annotations:
-            summary: "ArgoCD application {{ $labels.name }} unhealthy"
+            summary: {{ printf "ArgoCD application {{ $labels.name }} unhealthy" | quote }}
 
     - name: platform.karpenter
       interval: 1m

@@ -1,7 +1,4 @@
-# Controller role assumed via IRSA. The community-maintained
-# terraform-aws-modules/eks/aws//modules/karpenter sub-module already wires
-# this; we inline it here so we keep ownership of the policy surface and can
-# audit / tighten it over time.
+# Inlined controller IRSA so we own the policy surface.
 
 data "aws_iam_policy_document" "controller_assume" {
   statement {
@@ -98,8 +95,8 @@ data "aws_iam_policy_document" "controller" {
   # Instance profile management is per-cluster — Karpenter creates one
   # profile per NodeClass and tags it with the cluster name.
   statement {
-    sid     = "AllowScopedInstanceProfileCreate"
-    actions = ["iam:CreateInstanceProfile", "iam:TagInstanceProfile"]
+    sid       = "AllowScopedInstanceProfileCreate"
+    actions   = ["iam:CreateInstanceProfile", "iam:TagInstanceProfile"]
     resources = ["*"]
     condition {
       test     = "StringEquals"
@@ -109,8 +106,8 @@ data "aws_iam_policy_document" "controller" {
   }
 
   statement {
-    sid     = "AllowScopedInstanceProfileMutation"
-    actions = ["iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile", "iam:DeleteInstanceProfile", "iam:GetInstanceProfile"]
+    sid       = "AllowScopedInstanceProfileMutation"
+    actions   = ["iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile", "iam:DeleteInstanceProfile", "iam:GetInstanceProfile"]
     resources = ["*"]
     condition {
       test     = "StringEquals"
@@ -120,8 +117,8 @@ data "aws_iam_policy_document" "controller" {
   }
 
   statement {
-    sid    = "AllowInterruptionQueueActions"
-    actions = ["sqs:DeleteMessage", "sqs:GetQueueUrl", "sqs:GetQueueAttributes", "sqs:ReceiveMessage"]
+    sid       = "AllowInterruptionQueueActions"
+    actions   = ["sqs:DeleteMessage", "sqs:GetQueueUrl", "sqs:GetQueueAttributes", "sqs:ReceiveMessage"]
     resources = [aws_sqs_queue.interruption.arn]
   }
 

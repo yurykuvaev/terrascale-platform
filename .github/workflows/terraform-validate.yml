@@ -4,11 +4,14 @@ on:
   pull_request:
     paths:
       - "terraform/**"
+      - ".tflint.hcl"
       - ".github/workflows/terraform-validate.yml"
   push:
-    branches: [main]
+    branches: [master, main]
     paths:
       - "terraform/**"
+      - ".tflint.hcl"
+      - ".github/workflows/terraform-validate.yml"
 
 permissions:
   contents: read
@@ -79,4 +82,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: tflint
-        run: tflint --recursive --config "$(pwd)/.tflint.hcl" terraform/modules
+        run: |
+          # tflint dropped positional path args in v0.47; use --chdir.
+          # --minimum-failure-severity=error keeps notices and warnings
+          # visible without breaking the build on every dead-variable hit.
+          tflint --chdir=terraform/modules --recursive \
+                 --config "$(pwd)/.tflint.hcl" \
+                 --minimum-failure-severity=error

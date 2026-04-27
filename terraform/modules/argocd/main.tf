@@ -37,14 +37,8 @@ resource "kubernetes_secret_v1" "admin_secret" {
   }
 }
 
-resource "helm_release" "argocd" {
-  name       = "argocd"
-  repository = "https://argoproj.github.io/argo-helm"
-  chart      = "argo-cd"
-  version    = var.chart_version
-  namespace  = kubernetes_namespace_v1.argocd.metadata[0].name
-
-  values = [yamlencode({
+locals {
+  argocd_base_values = {
     global = {
       domain = var.ingress_host
     }
@@ -65,12 +59,35 @@ resource "helm_release" "argocd" {
       effect   = "NoSchedule"
     }]
 
-    redis-ha            = { enabled = var.ha }
-    controller          = var.ha ? { replicas = 2 } : {}
-    server              = var.ha ? { replicas = 2, autoscaling = { enabled = true, minReplicas = 2, maxReplicas = 5 } } : {}
-    repoServer          = var.ha ? { replicas = 2 } : {}
-    applicationSet      = var.ha ? { replicas = 2 } : {}
-  })]
+    redis-ha = { enabled = var.ha }
+  }
+
+  # jsondecode launders the conditional through a string so the two branches
+  # don't have to be the same statically-typed object. The alternative is
+  # a hand-written merge of every field, which is much louder.
+  argocd_ha_overrides = jsondecode(var.ha ? jsonencode({
+    controller = { replicas = 2 }
+    server = {
+      replicas = 2
+      autoscaling = {
+        enabled     = true
+        minReplicas = 2
+        maxReplicas = 5
+      }
+    }
+    repoServer     = { replicas = 2 }
+    applicationSet = { replicas = 2 }
+  }) : "{}")
+}
+
+resource "helm_release" "argocd" {
+  name       = "argocd"
+  repository = "https://argoproj.github.io/argo-helm"
+  chart      = "argo-cd"
+  version    = var.chart_version
+  namespace  = kubernetes_namespace_v1.argocd.metadata[0].name
+
+  values = [yamlencode(merge(local.argocd_base_values, local.argocd_ha_overrides))]
 
   depends_on = [kubernetes_secret_v1.admin_secret]
 }

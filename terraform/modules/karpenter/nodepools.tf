@@ -27,9 +27,9 @@ resource "kubernetes_manifest" "default_nodeclass" {
       blockDeviceMappings = [{
         deviceName = "/dev/xvda"
         ebs = {
-          volumeSize = "100Gi"
-          volumeType = "gp3"
-          encrypted  = true
+          volumeSize          = "100Gi"
+          volumeType          = "gp3"
+          encrypted           = true
           deleteOnTermination = true
         }
       }]
@@ -97,7 +97,7 @@ resource "kubernetes_manifest" "default_nodepool" {
               values   = ["on-demand", "spot"]
             },
           ]
-          expireAfter = "720h"  # 30 days, then nodes are gracefully replaced
+          expireAfter = "720h" # 30 days, then nodes are gracefully replaced
         }
       }
       limits = {

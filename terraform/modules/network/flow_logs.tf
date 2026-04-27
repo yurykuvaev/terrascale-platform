@@ -56,8 +56,8 @@ resource "aws_iam_role_policy" "flow_logs" {
 resource "aws_flow_log" "this" {
   count = var.enable_flow_logs ? 1 : 0
 
-  vpc_id          = module.vpc.vpc_id
-  traffic_type    = "ALL"
+  vpc_id                   = module.vpc.vpc_id
+  traffic_type             = "ALL"
   max_aggregation_interval = 60
 
   log_destination_type = var.flow_logs_destination_type

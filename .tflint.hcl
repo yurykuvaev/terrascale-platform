@@ -1,6 +1,6 @@
 config {
-  format = "compact"
-  call_module_type = "all"
+  format           = "compact"
+  call_module_type = "local"  # don't require remote modules to be initialised in CI
 }
 
 plugin "terraform" {
@@ -28,7 +28,9 @@ rule "terraform_unused_declarations" {
   enabled = true
 }
 
+# aws_resource_missing_tags is enforced at the provider level via Terragrunt's
+# default_tags block (see terraform/live/terragrunt.hcl). Modules don't need
+# to repeat them per-resource.
 rule "aws_resource_missing_tags" {
-  enabled = true
-  tags    = ["Project", "Environment", "ManagedBy"]
+  enabled = false
 }

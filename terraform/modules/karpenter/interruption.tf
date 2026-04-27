@@ -1,6 +1,4 @@
-# Spot interruption queue. EventBridge fans events from EC2 (instance state
-# changes, spot interruption warnings, scheduled events) into SQS; Karpenter
-# consumes them and gracefully drains affected nodes.
+# EventBridge -> SQS -> Karpenter. Drains nodes on spot interruption.
 
 resource "aws_sqs_queue" "interruption" {
   name                      = "${var.cluster_name}-karpenter-interruption"
@@ -13,9 +11,9 @@ resource "aws_sqs_queue" "interruption" {
 
 data "aws_iam_policy_document" "interruption_queue" {
   statement {
-    sid     = "AllowEventBridgeServices"
-    effect  = "Allow"
-    actions = ["sqs:SendMessage"]
+    sid       = "AllowEventBridgeServices"
+    effect    = "Allow"
+    actions   = ["sqs:SendMessage"]
     resources = [aws_sqs_queue.interruption.arn]
 
     principals {

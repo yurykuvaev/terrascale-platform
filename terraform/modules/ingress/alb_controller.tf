@@ -32,13 +32,13 @@ resource "aws_iam_policy" "alb_controller" {
 module "alb_controller_irsa" {
   source = "../irsa"
 
-  role_name          = "${var.cluster_name}-alb-controller"
-  oidc_provider_arn  = var.oidc_provider_arn
-  oidc_provider_url  = var.oidc_provider_url
-  namespace          = var.namespace
-  service_account    = "aws-load-balancer-controller"
-  policy_arns        = [aws_iam_policy.alb_controller.arn]
-  tags               = var.tags
+  role_name         = "${var.cluster_name}-alb-controller"
+  oidc_provider_arn = var.oidc_provider_arn
+  oidc_provider_url = var.oidc_provider_url
+  namespace         = var.namespace
+  service_account   = "aws-load-balancer-controller"
+  policy_arns       = [aws_iam_policy.alb_controller.arn]
+  tags              = var.tags
 }
 
 # Helm release for the ALB controller has moved to ArgoCD; see
