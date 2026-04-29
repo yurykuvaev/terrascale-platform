@@ -1,6 +1,7 @@
-// sample-service is the canary workload for the platform. It exposes a tiny
-// HTTP API plus Prometheus metrics, logs structured JSON to stdout, and
-// reads a greeting message from a Kubernetes Secret mounted via envFrom.
+// Package main implements sample-service, the canary workload for the
+// platform. It exposes a tiny HTTP API plus Prometheus metrics, logs
+// structured JSON to stdout, and reads a greeting message from a Kubernetes
+// Secret mounted via envFrom.
 //
 // Its job is to give us a small, real workload to exercise the full stack:
 // ALB ingress, cert-manager TLS, ExternalDNS records, ESO secret rendering,

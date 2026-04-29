@@ -35,23 +35,33 @@ func envOr(key, def string) string {
 }
 
 type Server struct {
-	cfg Config
-	log *zap.Logger
+	cfg      Config
+	log      *zap.Logger
+	registry *prometheus.Registry
 
 	requests *prometheus.CounterVec
 	latency  *prometheus.HistogramVec
 }
 
+// New constructs a Server with a fresh, isolated Prometheus registry. The
+// per-instance registry keeps the package free of process-global state, which
+// matters mostly for tests: spinning up multiple Servers in the same test
+// binary used to panic with "duplicate collector registration" against the
+// default registry.
 func New(cfg Config, log *zap.Logger) *Server {
+	reg := prometheus.NewRegistry()
+	factory := promauto.With(reg)
+
 	return &Server{
-		cfg: cfg,
-		log: log,
-		requests: promauto.NewCounterVec(prometheus.CounterOpts{
+		cfg:      cfg,
+		log:      log,
+		registry: reg,
+		requests: factory.NewCounterVec(prometheus.CounterOpts{
 			Namespace: "sample_service",
 			Name:      "requests_total",
 			Help:      "Total HTTP requests served, by route and status.",
 		}, []string{"route", "status"}),
-		latency: promauto.NewHistogramVec(prometheus.HistogramOpts{
+		latency: factory.NewHistogramVec(prometheus.HistogramOpts{
 			Namespace: "sample_service",
 			Name:      "request_duration_seconds",
 			Help:      "Latency distribution by route.",
@@ -65,7 +75,7 @@ func (s *Server) Routes() http.Handler {
 	mux.Handle("/", s.instrument("/", s.handleRoot))
 	mux.Handle("/healthz", s.instrument("/healthz", s.handleHealth))
 	mux.Handle("/readyz", s.instrument("/readyz", s.handleHealth))
-	mux.Handle("/metrics", promhttp.Handler())
+	mux.Handle("/metrics", promhttp.HandlerFor(s.registry, promhttp.HandlerOpts{Registry: s.registry}))
 	return mux
 }
 

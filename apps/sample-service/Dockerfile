@@ -9,11 +9,14 @@ ARG VERSION=dev
 
 WORKDIR /src
 
-COPY go.mod go.sum ./
-RUN --mount=type=cache,target=/go/pkg/mod \
-    go mod download
-
+COPY go.mod ./
 COPY . .
+
+# go mod tidy resolves and writes go.sum if absent. We pay this cost once
+# per layer (cache key includes go.mod), so it doesn't impact incremental
+# rebuilds.
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod tidy
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
