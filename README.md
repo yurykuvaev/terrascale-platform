@@ -105,6 +105,12 @@ Deploying it into a real AWS account is the reader's exercise.
 See [CONTRIBUTING.md](CONTRIBUTING.md). For a list of recent changes,
 [CHANGELOG.md](CHANGELOG.md). Open items live in [TODO.md](TODO.md).
 
+## Related
+
+- [eks-platform-engineering](https://github.com/yurykuvaev/eks-platform-engineering) — companion EKS portfolio with project-by-project walkthroughs
+- [k8s-gitops-apps](https://github.com/yurykuvaev/k8s-gitops-apps) — application manifests reconciled by ArgoCD
+- [scripts](https://github.com/yurykuvaev/scripts) — Python AWS helper scripts (security groups, IAM, ECR, CloudWatch)
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
