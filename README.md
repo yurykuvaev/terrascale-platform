@@ -90,7 +90,7 @@ The contentious decisions are recorded as ADRs:
 
 ## Cost
 
-This platform is not free to run. Steady-state estimates per envrionment
+This platform is not free to run. Steady-state estimates per environment
 are in [docs/cost-analysis.md](docs/cost-analysis.md): roughly $370/mo
 for dev, $630/mo for staging, $1300+/mo for prod.
 
