@@ -32,7 +32,7 @@ data:
           "gridPos": {"x": 6, "y": 0, "w": 18, "h": 8},
           "targets": [{
             "expr": "count by (capacity_type) (karpenter_nodes_total_count)",
-            "legendFormat": "{{capacity_type}}"
+            "legendFormat": "{{`{{capacity_type}}`}}"
           }]
         },
         {
