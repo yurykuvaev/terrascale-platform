@@ -100,7 +100,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: aquasecurity/trivy-action@0.24.0
+      - uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.IMAGE }}@${{ needs.build.outputs.image-digest }}
           format: sarif
