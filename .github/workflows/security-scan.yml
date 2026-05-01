@@ -30,7 +30,7 @@ jobs:
           sarif_file: tfsec.sarif
           working_directory: terraform/modules
 
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: tfsec.sarif
@@ -51,7 +51,7 @@ jobs:
           soft_fail: true
           skip_check: CKV_AWS_111,CKV_K8S_21
 
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: checkov.sarif
@@ -66,7 +66,7 @@ jobs:
           dockerfile: apps/sample-service/Dockerfile
           format: sarif
           output-file: hadolint.sarif
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: hadolint.sarif
