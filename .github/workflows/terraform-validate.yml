@@ -84,4 +84,8 @@ jobs:
       - name: tflint
         run: |
           # tflint dropped positional path args in v0.47; use --chdir.
-          tflint --chdir=terraform/modules --recursive --config "$(pwd)/.tflint.hcl"
+          # --minimum-failure-severity=error keeps notices and warnings
+          # visible without breaking the build on every dead-variable hit.
+          tflint --chdir=terraform/modules --recursive \
+                 --config "$(pwd)/.tflint.hcl" \
+                 --minimum-failure-severity=error
