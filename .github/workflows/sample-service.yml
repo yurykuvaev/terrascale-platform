@@ -9,6 +9,8 @@ on:
     branches: [master, main]
     paths:
       - "apps/sample-service/**"
+      - ".github/workflows/sample-service.yml"
+  workflow_dispatch:
 
 permissions:
   id-token: write
