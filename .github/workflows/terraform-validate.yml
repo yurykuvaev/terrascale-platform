@@ -4,11 +4,14 @@ on:
   pull_request:
     paths:
       - "terraform/**"
+      - ".tflint.hcl"
       - ".github/workflows/terraform-validate.yml"
   push:
     branches: [master, main]
     paths:
       - "terraform/**"
+      - ".tflint.hcl"
+      - ".github/workflows/terraform-validate.yml"
 
 permissions:
   contents: read
