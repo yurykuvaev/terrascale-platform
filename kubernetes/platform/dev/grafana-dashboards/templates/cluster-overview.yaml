@@ -51,7 +51,7 @@ data:
           "gridPos": {"x": 0, "y": 4, "w": 24, "h": 10},
           "targets": [{
             "expr": "sum by (namespace) (kube_pod_info)",
-            "legendFormat": "{{namespace}}"
+            "legendFormat": "{{`{{namespace}}`}}"
           }]
         }
       ]
