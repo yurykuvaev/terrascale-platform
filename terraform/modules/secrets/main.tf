@@ -11,7 +11,7 @@ data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "eso" {
   statement {
-    sid     = "ReadSecretsManagerScoped"
+    sid = "ReadSecretsManagerScoped"
     actions = [
       "secretsmanager:GetSecretValue",
       "secretsmanager:DescribeSecret",

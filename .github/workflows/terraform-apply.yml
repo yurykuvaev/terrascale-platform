@@ -1,10 +1,10 @@
 name: terraform-apply
 
+# Manual-only: this workflow assumes the OIDC role and Terragrunt state
+# backend exist in the target AWS account. Without that infrastructure
+# (the case for the portfolio repo as published) any push-triggered run
+# would fail noisily. Trigger from the Actions tab when ready.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "terraform/**"
   workflow_dispatch:
     inputs:
       env:

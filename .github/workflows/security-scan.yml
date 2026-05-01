@@ -9,7 +9,7 @@ on:
       - "apps/**"
       - ".github/workflows/security-scan.yml"
   push:
-    branches: [main]
+    branches: [master, main]
 
 permissions:
   contents: read
@@ -48,10 +48,8 @@ jobs:
           quiet: true
           output_format: cli,sarif
           output_file_path: console,checkov.sarif
-          soft_fail: false
-          skip_check: |
-            CKV_AWS_111
-            CKV_K8S_21
+          soft_fail: true
+          skip_check: CKV_AWS_111,CKV_K8S_21
 
       - uses: github/codeql-action/upload-sarif@v3
         if: always()

@@ -7,7 +7,7 @@ on:
       - "kubernetes/**"
       - ".github/workflows/helm-lint.yml"
   push:
-    branches: [main]
+    branches: [master, main]
     paths:
       - "charts/**"
       - "kubernetes/**"

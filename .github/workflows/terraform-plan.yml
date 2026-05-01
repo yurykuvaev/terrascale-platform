@@ -1,9 +1,10 @@
 name: terraform-plan
 
+# Manual-only: this workflow needs the OIDC plan role and the S3 backend
+# to exist in the target AWS account. Without that wiring it can't run
+# `terragrunt plan`. Trigger from the Actions tab when AWS is connected.
 on:
-  pull_request:
-    paths:
-      - "terraform/**"
+  workflow_dispatch:
 
 permissions:
   id-token: write    # OIDC: assume the per-env plan role

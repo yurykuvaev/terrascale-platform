@@ -65,11 +65,11 @@ resource "helm_release" "argocd" {
       effect   = "NoSchedule"
     }]
 
-    redis-ha            = { enabled = var.ha }
-    controller          = var.ha ? { replicas = 2 } : {}
-    server              = var.ha ? { replicas = 2, autoscaling = { enabled = true, minReplicas = 2, maxReplicas = 5 } } : {}
-    repoServer          = var.ha ? { replicas = 2 } : {}
-    applicationSet      = var.ha ? { replicas = 2 } : {}
+    redis-ha       = { enabled = var.ha }
+    controller     = var.ha ? { replicas = 2 } : {}
+    server         = var.ha ? { replicas = 2, autoscaling = { enabled = true, minReplicas = 2, maxReplicas = 5 } } : {}
+    repoServer     = var.ha ? { replicas = 2 } : {}
+    applicationSet = var.ha ? { replicas = 2 } : {}
   })]
 
   depends_on = [kubernetes_secret_v1.admin_secret]

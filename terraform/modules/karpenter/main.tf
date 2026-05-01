@@ -2,10 +2,10 @@ resource "kubernetes_namespace_v1" "karpenter" {
   metadata {
     name = var.namespace
     labels = {
-      "app.kubernetes.io/managed-by"        = "terraform"
-      "pod-security.kubernetes.io/enforce"  = "restricted"
-      "pod-security.kubernetes.io/audit"    = "restricted"
-      "pod-security.kubernetes.io/warn"     = "restricted"
+      "app.kubernetes.io/managed-by"       = "terraform"
+      "pod-security.kubernetes.io/enforce" = "restricted"
+      "pod-security.kubernetes.io/audit"   = "restricted"
+      "pod-security.kubernetes.io/warn"    = "restricted"
     }
   }
 }

@@ -7,7 +7,7 @@
 
 locals {
   default_node_group_defaults = {
-    ami_type                   = "AL2023_x86_64_STANDARD"
+    ami_type                       = "AL2023_x86_64_STANDARD"
     use_latest_ami_release_version = true
 
     iam_role_additional_policies = {
@@ -19,9 +19,9 @@ locals {
       xvda = {
         device_name = "/dev/xvda"
         ebs = {
-          volume_size = 50
-          volume_type = "gp3"
-          encrypted   = true
+          volume_size           = 50
+          volume_type           = "gp3"
+          encrypted             = true
           delete_on_termination = true
         }
       }

@@ -13,9 +13,9 @@ resource "aws_sqs_queue" "interruption" {
 
 data "aws_iam_policy_document" "interruption_queue" {
   statement {
-    sid     = "AllowEventBridgeServices"
-    effect  = "Allow"
-    actions = ["sqs:SendMessage"]
+    sid       = "AllowEventBridgeServices"
+    effect    = "Allow"
+    actions   = ["sqs:SendMessage"]
     resources = [aws_sqs_queue.interruption.arn]
 
     principals {

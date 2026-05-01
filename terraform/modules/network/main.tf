@@ -2,14 +2,14 @@ locals {
   # EKS subnet discovery tags. The AWS Load Balancer Controller and Karpenter
   # both honour these to pick subnets for ALBs and node provisioning.
   eks_public_subnet_tags = var.cluster_name == null ? {} : {
-    "kubernetes.io/role/elb"                      = "1"
-    "kubernetes.io/cluster/${var.cluster_name}"   = "shared"
+    "kubernetes.io/role/elb"                    = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 
   eks_private_subnet_tags = var.cluster_name == null ? {} : {
-    "kubernetes.io/role/internal-elb"             = "1"
-    "kubernetes.io/cluster/${var.cluster_name}"   = "shared"
-    "karpenter.sh/discovery"                      = var.cluster_name
+    "kubernetes.io/role/internal-elb"           = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "karpenter.sh/discovery"                    = var.cluster_name
   }
 }
 

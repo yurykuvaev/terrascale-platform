@@ -6,7 +6,7 @@ on:
       - "apps/sample-service/**"
       - ".github/workflows/sample-service.yml"
   push:
-    branches: [main]
+    branches: [master, main]
     paths:
       - "apps/sample-service/**"
 
@@ -31,7 +31,10 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.22"
-          cache-dependency-path: apps/sample-service/go.sum
+
+      - name: go mod tidy
+        working-directory: apps/sample-service
+        run: go mod tidy
 
       - name: go vet
         working-directory: apps/sample-service

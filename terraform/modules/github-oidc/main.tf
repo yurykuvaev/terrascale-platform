@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "plan_assume" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = [
+      values = [
         for repo, _ in var.trusted_repos : "repo:${var.github_owner}/${repo}:pull_request"
       ]
     }
@@ -47,10 +47,10 @@ data "aws_iam_policy_document" "plan_assume" {
 }
 
 resource "aws_iam_role" "plan" {
-  name               = var.plan_role_name
-  assume_role_policy = data.aws_iam_policy_document.plan_assume.json
+  name                 = var.plan_role_name
+  assume_role_policy   = data.aws_iam_policy_document.plan_assume.json
   max_session_duration = 3600
-  tags               = var.tags
+  tags                 = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "plan_readonly" {
@@ -78,7 +78,7 @@ data "aws_iam_policy_document" "apply_assume" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = [
+      values = [
         for repo, _ in var.trusted_repos : "repo:${var.github_owner}/${repo}:ref:refs/heads/main"
       ]
     }
@@ -86,10 +86,10 @@ data "aws_iam_policy_document" "apply_assume" {
 }
 
 resource "aws_iam_role" "apply" {
-  name               = var.apply_role_name
-  assume_role_policy = data.aws_iam_policy_document.apply_assume.json
+  name                 = var.apply_role_name
+  assume_role_policy   = data.aws_iam_policy_document.apply_assume.json
   max_session_duration = 3600
-  tags               = var.tags
+  tags                 = var.tags
 }
 
 # Apply role gets PowerUser + IAM full (Terraform creates roles). Tighten
@@ -124,7 +124,7 @@ data "aws_iam_policy_document" "image_publish_assume" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = [
+      values = [
         for repo, _ in var.trusted_repos : "repo:${var.github_owner}/${repo}:ref:refs/heads/main"
       ]
     }
@@ -132,10 +132,10 @@ data "aws_iam_policy_document" "image_publish_assume" {
 }
 
 resource "aws_iam_role" "image_publish" {
-  name               = var.image_publish_role_name
-  assume_role_policy = data.aws_iam_policy_document.image_publish_assume.json
+  name                 = var.image_publish_role_name
+  assume_role_policy   = data.aws_iam_policy_document.image_publish_assume.json
   max_session_duration = 3600
-  tags               = var.tags
+  tags                 = var.tags
 }
 
 data "aws_iam_policy_document" "image_publish" {
