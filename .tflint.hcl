@@ -1,6 +1,6 @@
 config {
-  format = "compact"
-  call_module_type = "all"
+  format           = "compact"
+  call_module_type = "local"  # don't require remote modules to be initialised in CI
 }
 
 plugin "terraform" {
