@@ -79,4 +79,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: tflint
-        run: tflint --recursive --config "$(pwd)/.tflint.hcl" terraform/modules
+        run: |
+          # tflint dropped positional path args in v0.47; use --chdir.
+          tflint --chdir=terraform/modules --recursive --config "$(pwd)/.tflint.hcl"
