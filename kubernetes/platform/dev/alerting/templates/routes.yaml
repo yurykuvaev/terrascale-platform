@@ -1,3 +1,8 @@
+{{/*
+  All `{{ .CommonLabels.X }}` and `{{ range .Alerts }}` placeholders below
+  are AlertManager Go-template expressions, evaluated at notification time.
+  Wrap them in `{{`...`}}` so Helm passes them through verbatim.
+*/}}
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: AlertmanagerConfig
 metadata:
@@ -42,18 +47,18 @@ spec:
             key: webhook-platform
           channel: "#platform-alerts"
           sendResolved: true
-          title: "{{ .CommonLabels.alertname }}"
+          title: {{`"{{ .CommonLabels.alertname }}"`}}
           text: |
-            *Severity:* {{ .CommonLabels.severity }}
-            *Namespace:* {{ .CommonLabels.namespace }}
-            {{ range .Alerts }}{{ .Annotations.description }}{{ end }}
+            *Severity:* {{`{{ .CommonLabels.severity }}`}}
+            *Namespace:* {{`{{ .CommonLabels.namespace }}`}}
+            {{`{{ range .Alerts }}{{ .Annotations.description }}{{ end }}`}}
 
     - name: slack-tenant
       slackConfigs:
         - apiURL:
             name: alertmanager-slack
             key: webhook-tenant
-          channel: "#alerts-{{ .CommonLabels.tenant }}"
+          channel: {{`"#alerts-{{ .CommonLabels.tenant }}"`}}
           sendResolved: true
 
     - name: slack-karpenter
@@ -69,5 +74,5 @@ spec:
         - routingKey:
             name: alertmanager-pagerduty
             key: routing-key
-          description: "{{ .CommonLabels.alertname }} ({{ .CommonLabels.namespace }})"
-          severity: "{{ .CommonLabels.severity }}"
+          description: {{`"{{ .CommonLabels.alertname }} ({{ .CommonLabels.namespace }})"`}}
+          severity: {{`"{{ .CommonLabels.severity }}"`}}
