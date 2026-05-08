@@ -39,7 +39,7 @@ jobs:
           terragrunt -v
 
       - name: configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::123456789012:role/terrascale-${{ matrix.env }}-ci-plan
           aws-region: us-east-1
